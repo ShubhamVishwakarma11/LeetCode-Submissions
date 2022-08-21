@@ -1,24 +1,31 @@
 class Solution {
 public:
-    
-    int f (int row, int col, vector<vector<int>> &dp, vector<vector<int>> &triangle) {
-        if (row == 0 && col == 0) return triangle[0][0];
-        if (row<0 || col<0 || col>row) return 1e4;
-        
-        if (dp[row][col] != INT_MIN) return dp[row][col];
-        int left = f(row-1, col-1,dp,triangle) + triangle[row][col];
-        int right = f(row-1, col,dp,triangle) + triangle[row][col];
-        
-        return dp[row][col] = min (left,right);
-    }
-    
     int minimumTotal(vector<vector<int>>& triangle) {
         int n = triangle.size();
-        int res = INT_MAX;
-        vector<vector<int>> dp (n, vector<int> (n, INT_MIN));
-        for (int i=0;i<n;i++) {
-            res = min (res, f(n-1,i,dp,triangle));
-            cout << f(n-1,i,dp,triangle) << ' ';
+        vector<vector<int>> dp (n, vector<int> (n,INT_MIN));
+        
+        for (int row=0;row<n;row++) {
+            for (int col=0;col<=row;col++) {
+                if (row==0) {
+                    dp[0][0] = triangle[0][0];
+                }
+                else if (col==0) {
+                    dp[row][col] = dp[row-1][col] + triangle[row][col];
+                }
+                else if (row == col) {
+                    dp[row][col] = dp[row-1][col-1] + triangle[row][col];
+                }
+                else {
+                    int left = dp[row-1][col-1] + triangle[row][col];
+                    int right = dp[row-1][col] + triangle[row][col];
+                    dp[row][col] = min (left,right); 
+                }
+            }
+        }
+        
+        int res = dp[n-1][0];
+        for (auto it : dp[n-1]) {
+            if (it<res) res = it;
         }
         
         return res;
